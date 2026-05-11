@@ -1,6 +1,3 @@
-import uvloop
-uvloop.install()
-
 from pyrogram import filters
 
 from bot import app, userbot
