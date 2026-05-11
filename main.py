@@ -1,6 +1,9 @@
 from pyrogram import filters
 
-from bot import app
+from bot import app, userbot
+
+# START USERBOT
+userbot.start()
 
 # USER HANDLERS
 import handlers.start
@@ -26,7 +29,7 @@ import admin.stats
 # SYNC SYSTEM
 import admin.sync_channel
 import admin.sync_demo
-
+import admin.syncnew
 
 print("🚀 BOT STARTED SUCCESSFULLY")
 
@@ -40,4 +43,5 @@ async def ping(_, message):
     )
 
 
+# START BOT
 app.run()
