@@ -22,6 +22,8 @@ async def buy(client, message):
 
         user = await get_user(user_id)
 
+        expiry = user.get("expiry")
+
         return await message.reply_text(
             f"""
 ╔════════════════════╗
@@ -30,13 +32,18 @@ async def buy(client, message):
 
 ✅ You Are Already A Premium Member
 
-📅 Expiry :
-{user.get('expiry')}
+📅 Expiry Date :
+{expiry.strftime("%d-%m-%Y")}
+
+━━━━━━━━━━━━━━━━━━━
 
 ⚡ Daily Limit : 100 Videos
 🛡 Protected Content Enabled
+🎬 Unlimited Premium Access
 
-🔥 Enjoy Unlimited Premium Access
+━━━━━━━━━━━━━━━━━━━
+
+🔥 Enjoy Premium Features
 """
         )
 
