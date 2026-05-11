@@ -4,6 +4,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot import app
 from database.users_db import add_user
 
+
 START_TEXT = """
 ╔════════════════╗
    👑 PREMIUM HUB 👑
@@ -16,11 +17,15 @@ START_TEXT = """
 """
 
 
+START_PIC = "assets/banner.jpg"
+
+
 @app.on_message(filters.command("start"))
 async def start(client, message):
 
     try:
         await add_user(message.from_user.id)
+
     except Exception as e:
         print(f"ADD USER ERROR: {e}")
 
@@ -32,7 +37,8 @@ async def start(client, message):
         [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/courses_hub2_bot")]
     ])
 
-    await message.reply_text(
-        START_TEXT,
+    await message.reply_photo(
+        photo=START_PIC,
+        caption=START_TEXT,
         reply_markup=buttons
     )
