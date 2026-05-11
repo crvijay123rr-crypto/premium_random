@@ -1,7 +1,11 @@
 from pyrogram import filters
 
-from bot import app
+from bot import app, userbot
 
+# =========================
+# START USERBOT
+# =========================
+userbot.start()
 
 # =========================
 # USER HANDLERS
@@ -45,7 +49,15 @@ print("🚀 BOT STARTED SUCCESSFULLY")
 async def ping(_, message):
 
     await message.reply_text(
-        "🏓 Pong!"
+        """
+╔════════════════════╗
+        🏓 PONG 🏓
+╚════════════════════╝
+
+✅ Bot Is Running Successfully
+⚡ Server Status : Online
+🚀 Speed : Fast
+"""
     )
 
 
