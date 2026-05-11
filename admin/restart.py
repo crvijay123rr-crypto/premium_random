@@ -6,8 +6,10 @@ from pyrogram import filters
 from main import app
 from admin.admin import admin_filter
 
+
 @app.on_message(filters.command("restart") & admin_filter)
 async def restart(client, message):
 
-    await message.reply_text(
-        "
+    await message.reply_text("🔄 Bot Restarting...")
+
+    os.execl(sys.executable, sys.executable, *sys.argv)
