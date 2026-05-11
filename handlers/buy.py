@@ -14,10 +14,9 @@ async def buy(client, message):
 
 💰 Price : ₹{PLAN_PRICE}
 
-🟢 UPI Payment:
-upi://pay?pa=yourupi@upi
-
-📤 Send Screenshot After Payment
+🟢 UPI Payment:❌
+only phone pay gift card payment ✅✅
+📤 Send Screenshot After Payment @Contact_45bot
 """
 
     await message.reply_text(text)# Buy handler
