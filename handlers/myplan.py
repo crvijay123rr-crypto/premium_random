@@ -2,22 +2,32 @@ from pyrogram import filters
 
 from bot import app
 
-from database.users_db import get_user
+from database.users_db import (
+    get_user,
+    is_premium
+)
 
 
 @app.on_message(filters.command("myplan"))
 async def myplan(client, message):
 
-    user = await get_user(message.from_user.id)
+    user_id = message.from_user.id
+
+    user = await get_user(user_id)
 
     # USER NOT FOUND
     if not user:
+
         return await message.reply_text(
-            "❌ User not found.\nPlease send /start first."
+            "❌ User not found.\nPlease send start first."
         )
 
+    # PREMIUM CHECK
+    premium = await is_premium(user_id)
+
     # NO PREMIUM
-    if not user.get("premium"):
+    if not premium:
+
         return await message.reply_text(
             """
 ╔════════════════════╗
@@ -33,15 +43,18 @@ Active Premium Plan
         )
 
     # TOTAL RECEIVED
-    total_received = user.get("total_received", 0)
+    total_received = user.get(
+        "total_received",
+        0
+    )
 
     text = f"""
 ╔════════════════════╗
-      👑 MY PREMIUM 👑
+      👑 PREMIUM ACTIVE 👑
 ╚════════════════════╝
 
 📅 Expiry Date :
-{user.get('expiry', 'Not Set')}
+{user.get('expiry')}
 
 ━━━━━━━━━━━━━━━━━━━
 
