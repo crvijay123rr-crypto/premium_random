@@ -1,10 +1,17 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.errors import UserNotParticipant
 
 from bot import app
-from config import FORCE_SUB
 from database.users_db import add_user
 
+# IMPORT FUNCTIONS
+from handlers.videos import send_videos
+from handlers.demo import demo
+from handlers.buy import buy
+from handlers.myplan import myplan
+
+CHANNEL_USERNAME = "BOTUPDATEDARK"
 
 START_TEXT = """
 ╔════════════════╗
@@ -14,50 +21,59 @@ START_TEXT = """
 🔥 Unlimited Random Videos
 ⚡ Daily 100 Videos
 🛡 Protected Content
-💎 Monthly VIP Access 🎥videos saved your database only 30 days 
+💎 Monthly VIP Access
+
+🎥 Videos Saved In Database
+Only For 30 Days
 """
 
 START_PIC = "assets/banner.jpg"
 
 
-# FORCE SUB CHECK
-async def check_force_sub(client, user_id):
+# =========================
+# CHECK CHANNEL JOIN
+# =========================
+async def is_joined(client, user_id):
 
     try:
-        member = await client.get_chat_member(
-            FORCE_SUB,
+
+        await client.get_chat_member(
+            CHANNEL_USERNAME,
             user_id
         )
 
-        if member.status in [
-            "member",
-            "administrator",
-            "creator"
-        ]:
-            return True
+        return True
 
-    except:
+    except UserNotParticipant:
+
         return False
 
-    return False
+    except:
+
+        return False
 
 
+# =========================
+# START COMMAND
+# =========================
 @app.on_message(filters.command("start"))
 async def start(client, message):
 
     user_id = message.from_user.id
 
-    # CHECK CHANNEL JOIN
-    joined = await check_force_sub(client, user_id)
+    joined = await is_joined(
+        client,
+        user_id
+    )
 
-    # NOT JOINED
+    # USER NOT JOINED
     if not joined:
 
         buttons = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton(
                     "📢 JOIN NOW",
-                    url=f"https://t.me/{FORCE_SUB.replace('@', '')}"
+                    url="https://t.me/BOTUPDATEDARK"
                 )
             ],
             [
@@ -81,13 +97,9 @@ async def start(client, message):
         )
 
     # ADD USER
-    try:
-        await add_user(user_id)
+    await add_user(user_id)
 
-    except Exception as e:
-        print(f"ADD USER ERROR: {e}")
-
-    # MAIN BUTTONS
+    # MAIN MENU
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("🎥 GET VIDEOS", callback_data="videos")],
         [InlineKeyboardButton("🎁 FREE DEMO", callback_data="demo")],
@@ -103,22 +115,26 @@ async def start(client, message):
     )
 
 
+# =========================
 # TRY AGAIN BUTTON
-@app.on_callback_query(filters.regex("check_join"))
-async def check_join_callback(client, query):
+# =========================
+@app.on_callback_query(filters.regex("^check_join$"))
+async def check_join(client, query):
 
-    joined = await check_force_sub(
+    joined = await is_joined(
         client,
         query.from_user.id
     )
 
+    # STILL NOT JOINED
     if not joined:
 
         return await query.answer(
-            "❌ Please Join Channel First",
+            "❌ Join Channel First",
             show_alert=True
         )
 
+    # MAIN MENU
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("🎥 GET VIDEOS", callback_data="videos")],
         [InlineKeyboardButton("🎁 FREE DEMO", callback_data="demo")],
@@ -127,9 +143,78 @@ async def check_join_callback(client, query):
         [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/Contact_45bot")]
     ])
 
-    await query.message.edit_caption(
+    try:
+        await query.message.delete()
+
+    except:
+        pass
+
+    await query.message.reply_photo(
+        photo=START_PIC,
         caption=START_TEXT,
         reply_markup=buttons
     )
 
-    await query.answer("✅ Access Granted")
+    await query.answer(
+        "✅ Access Granted"
+    )
+
+
+# =========================
+# GET VIDEOS BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^videos$"))
+async def videos_callback(client, query):
+
+    await query.answer(
+        "⚡ Sending Videos..."
+    )
+
+    await send_videos(
+        client,
+        query.message
+    )
+
+
+# =========================
+# DEMO BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^demo$"))
+async def demo_callback(client, query):
+
+    await query.answer(
+        "🎁 Sending Demo..."
+    )
+
+    await demo(
+        client,
+        query.message
+    )
+
+
+# =========================
+# BUY BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^buy$"))
+async def buy_callback(client, query):
+
+    await query.answer()
+
+    await buy(
+        client,
+        query.message
+    )
+
+
+# =========================
+# MY PLAN BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^myplan$"))
+async def myplan_callback(client, query):
+
+    await query.answer()
+
+    await myplan(
+        client,
+        query.message
+)
