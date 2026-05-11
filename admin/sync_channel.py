@@ -17,13 +17,19 @@ async def sync_channel(client, message):
         "🔄 Sync Started..."
     )
 
+    # LOAD CHANNEL
+    await app.get_chat(PREMIUM_CHANNEL)
+
     async for msg in app.get_chat_history(PREMIUM_CHANNEL):
 
         try:
 
             if msg.video:
 
-                await add_video(msg.id)
+                await add_video(
+                    PREMIUM_CHANNEL,
+                    msg.id
+                )
 
                 count += 1
 
