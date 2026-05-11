@@ -1,54 +1,57 @@
 from pyrogram import filters
 
 from bot import app
-from admin.admin import admin_filter
 
-from database.users_db import activate_premium
+from database.users_db import is_premium
 
 
-@app.on_message(filters.command("addpremium") & admin_filter)
-async def addpremium(client, message):
+@app.on_message(filters.command("buy"))
+async def buy(client, message):
 
-    try:
-        user_id = int(message.command[1])
+    user_id = message.from_user.id
 
-    except:
+    # CHECK PREMIUM
+    premium = await is_premium(user_id)
+
+    # ALREADY PREMIUM
+    if premium:
+
         return await message.reply_text(
-            "❌ Usage : /addpremium user_id"
-        )
+            """
+╔════════════════════╗
+   👑 PREMIUM ACTIVE 👑
+╚════════════════════╝
 
-    # ACTIVATE PREMIUM
-    await activate_premium(user_id)
-
-    # ADMIN REPLY
-    await message.reply_text(
-        "✅ Premium Activated Successfully"
-    )
-
-    # USER MESSAGE
-    try:
-
-        text = f"""
-╔══════════════════╗
-     👑 PREMIUM ACTIVE 👑
-╚══════════════════╝
-
-🎉 Congratulations!
-
-💎 Your Premium Has Been Activated Successfully
-
-⚡ Daily Limit : 100 Videos
-📅 Plan : 30 Days
-🛡 Protected Content Enabled
+✅ You Are Already A Premium Member
 
 🔥 Enjoy Unlimited Premium Access
+⚡ Daily 100 Videos Available
+🛡 Protected Content Enabled
 """
-
-        await app.send_message(
-            chat_id=user_id,
-            text=text
         )
 
-    except Exception as e:
+    # BUY MESSAGE
+    await message.reply_text(
+        """
+╔════════════════════╗
+      💎 BUY PREMIUM 💎
+╚════════════════════╝
 
-        print(f"USER MESSAGE ERROR : {e}")
+🔥 Unlock Premium Features
+
+⚡ Daily 100 Videos
+🛡 Protected Content
+🎬 Unlimited Access
+
+━━━━━━━━━━━━━━━━━━━
+
+💰 Price : ₹200 / 30 Days
+
+📩 Contact Admin :
+@Contact_45bot
+
+━━━━━━━━━━━━━━━━━━━
+
+🚀 Activate Premium Instantly
+"""
+    )
