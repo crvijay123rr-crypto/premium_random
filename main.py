@@ -1,3 +1,6 @@
+import uvloop
+uvloop.install()
+
 from pyrogram import filters
 
 from bot import app, userbot
@@ -25,8 +28,6 @@ import admin.broadcast
 import admin.ban
 import admin.unban
 import admin.stats
-
-# SYNC SYSTEM
 import admin.sync_channel
 import admin.sync_demo
 import admin.syncnew
