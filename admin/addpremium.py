@@ -1,8 +1,12 @@
 from pyrogram import filters
 
 from bot import app
+from config import PLAN_PRICE
 
-from database.users_db import is_premium
+from database.users_db import (
+    is_premium,
+    get_user
+)
 
 
 @app.on_message(filters.command("buy"))
@@ -16,23 +20,29 @@ async def buy(client, message):
     # ALREADY PREMIUM
     if premium:
 
+        user = await get_user(user_id)
+
         return await message.reply_text(
-            """
+            f"""
 ╔════════════════════╗
    👑 PREMIUM ACTIVE 👑
 ╚════════════════════╝
 
 ✅ You Are Already A Premium Member
 
-🔥 Enjoy Unlimited Premium Access
-⚡ Daily 100 Videos Available
+📅 Expiry :
+{user.get('expiry')}
+
+⚡ Daily Limit : 100 Videos
 🛡 Protected Content Enabled
+
+🔥 Enjoy Unlimited Premium Access
 """
         )
 
     # BUY MESSAGE
     await message.reply_text(
-        """
+        f"""
 ╔════════════════════╗
       💎 BUY PREMIUM 💎
 ╚════════════════════╝
@@ -45,7 +55,10 @@ async def buy(client, message):
 
 ━━━━━━━━━━━━━━━━━━━
 
-💰 Price : ₹200 / 30 Days
+📅 Plan : Custom Days Available
+
+💰 Price Starts From :
+₹{PLAN_PRICE}
 
 📩 Contact Admin :
 @Contact_45bot
