@@ -19,17 +19,41 @@ async def myplan(client, message):
     # NO PREMIUM
     if not user.get("premium"):
         return await message.reply_text(
-            "❌ No Active Premium"
+            """
+╔════════════════════╗
+      ❌ NO PREMIUM ❌
+╚════════════════════╝
+
+💎 You Don't Have Any
+Active Premium Plan
+
+📩 DM FAST :
+@Contact_45bot
+"""
         )
 
-    text = f"""
-👑 PREMIUM ACTIVE
+    # TOTAL RECEIVED
+    total_received = user.get("total_received", 0)
 
-📅 Expiry :
+    text = f"""
+╔════════════════════╗
+      👑 MY PREMIUM 👑
+╚════════════════════╝
+
+📅 Expiry Date :
 {user.get('expiry', 'Not Set')}
 
-🎥 Used Today :
+━━━━━━━━━━━━━━━━━━━
+
+🎥 Videos Used Today :
 {user.get('used_today', 0)}/100
+
+📦 Total Videos Received :
+{total_received}
+
+━━━━━━━━━━━━━━━━━━━
+
+🚀 Enjoy Premium Access
 """
 
     await message.reply_text(text)
