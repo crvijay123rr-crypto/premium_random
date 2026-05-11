@@ -16,96 +16,126 @@ from database.videos_db import (
     get_demo_videos
 )
 
+# ANTI SPAM
+demo_locks = {}
+
 
 @app.on_message(filters.command("demo"))
 async def demo(client, message):
 
     user_id = message.from_user.id
 
-    # ADD USER
-    await add_user(user_id)
-
-    # GET USER
-    user = await get_user(user_id)
-
-    # DEMO LIMIT
-    if user.get("demo_used", 0) >= 1:
+    # SPAM PROTECTION
+    if user_id in demo_locks:
 
         return await message.reply_text(
-            "❌ Demo Limit Finished"
+            "⚠️ Please Wait..."
         )
 
-    # GET DEMO VIDEOS
-    demo_videos = await get_demo_videos()
+    demo_locks[user_id] = True
 
-    if not demo_videos:
+    try:
 
-        return await message.reply_text(
-            "❌ No Demo Videos"
-        )
+        # ADD USER
+        await add_user(user_id)
 
-    # RANDOMIZE VIDEOS
-    random.shuffle(demo_videos)
+        # GET USER
+        user = await get_user(user_id)
 
-    # SELECT 50 VIDEOS
-    selected = demo_videos[:50]
+        # DEMO LIMIT
+        if user.get("demo_used", 0) >= 1:
 
-    await message.reply_text(
-        f"🎬 Sending {len(selected)} Demo Videos..."
-    )
-
-    sent_messages = []
-
-    sent_count = 0
-
-    # SEND VIDEOS
-    for video in selected:
-
-        try:
-
-            sent = await app.copy_message(
-                chat_id=message.chat.id,
-                from_chat_id=video["channel"],
-                message_id=video["msg_id"],
-                protect_content=True
-            )
-
-            sent_messages.append(sent)
-
-            sent_count += 1
-
-            # SMALL DELAY
-            await asyncio.sleep(1)
-
-        except FloodWait as e:
-
-            print(f"FloodWait: {e.value}")
-
-            await asyncio.sleep(e.value)
-
-        except Exception as e:
-
-            print(e)
-
-    # INCREASE DEMO LIMIT
-    await increase_demo(user_id)
-
-    # SUCCESS MESSAGE
-await message.reply_text(
-    f"✅ Sent {sent_count} Demo Videos"
-)
-
-# WARNING MESSAGE
-warning_msg = await message.reply_text(
-    """
+            return await message.reply_text(
+                """
 ╔════════════════════╗
-       ⚠️ DEMO NOTICE ⚠️
+      ❌ DEMO FINISHED ❌
 ╚════════════════════╝
 
-🎥 These Were Only Demo Videos
+⚠️ Your Free Demo Limit
+Has Been Completed
 
-🗑 All Demo Videos Will Be
-Deleted Automatically In 2 Minutes
+━━━━━━━━━━━━━━━━━━━
+
+💎 Buy Premium For
+Unlimited Access
+
+📩 DM FAST :
+@Contact_45bot
+
+━━━━━━━━━━━━━━━━━━━
+
+🚀 Unlock Premium Instantly
+"""
+            )
+
+        # GET DEMO VIDEOS
+        demo_videos = await get_demo_videos()
+
+        if not demo_videos:
+
+            return await message.reply_text(
+                "❌ No Demo Videos Found"
+            )
+
+        # RANDOMIZE
+        random.shuffle(demo_videos)
+
+        # SELECT 50
+        selected = demo_videos[:50]
+
+        status = await message.reply_text(
+            f"⚡ Sending {len(selected)} Demo Videos..."
+        )
+
+        sent_messages = []
+
+        sent_count = 0
+
+        # SEND VIDEOS
+        for video in selected:
+
+            try:
+
+                sent = await app.copy_message(
+                    chat_id=message.chat.id,
+                    from_chat_id=video["channel"],
+                    message_id=video["msg_id"],
+                    protect_content=True
+                )
+
+                sent_messages.append(sent)
+
+                sent_count += 1
+
+                # FAST SAFE DELAY
+                await asyncio.sleep(0.3)
+
+            except FloodWait as e:
+
+                await asyncio.sleep(e.value)
+
+            except Exception as e:
+
+                print(e)
+
+        # INCREASE DEMO
+        await increase_demo(user_id)
+
+        # SUCCESS MESSAGE
+        await status.edit_text(
+            f"""
+╔════════════════════╗
+      ✅ DEMO SENT ✅
+╚════════════════════╝
+
+🎬 Successfully Sent :
+{sent_count} Demo Videos
+
+━━━━━━━━━━━━━━━━━━━
+
+⚠️ All Videos Will Be
+Deleted Automatically
+In 2 Minutes
 
 ━━━━━━━━━━━━━━━━━━━
 
@@ -119,23 +149,28 @@ Unlimited Full Access
 
 🚀 Unlock Premium Instantly
 """
-)
+        )
 
-# WAIT 2 MINUTES
-await asyncio.sleep(120)
+        # WAIT 2 MINUTES
+        await asyncio.sleep(120)
 
-    # DELETE ALL DEMO VIDEOS
-    for msg in sent_messages:
+        # DELETE DEMO VIDEOS
+        for msg in sent_messages:
 
+            try:
+                await msg.delete()
+
+            except:
+                pass
+
+        # DELETE STATUS MESSAGE
         try:
-            await msg.delete()
+            await status.delete()
 
-        except Exception as e:
-            print(e)
+        except:
+            pass
 
-    # DELETE WARNING MESSAGE
-    try:
-        await warning_msg.delete()
+    finally:
 
-    except:
-        pass
+        # REMOVE LOCK
+        demo_locks.pop(user_id, None)
