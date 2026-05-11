@@ -79,7 +79,18 @@ async def send_videos(client, message):
         if user.get("used_today", 0) >= DAILY_LIMIT:
 
             return await message.reply_text(
-                "❌ Daily Limit Reached"
+                """
+╔════════════════════╗
+      ⚠️ DAILY LIMIT ⚠️
+╚════════════════════╝
+
+❌ Your Daily Limit Reached
+
+🎬 Limit :
+100 Videos Per Day
+
+⏳ Try Again Tomorrow
+"""
             )
 
         # GET VIDEOS
@@ -137,6 +148,8 @@ async def send_videos(client, message):
             f"⚡ Sending {len(selected_videos)} Premium Videos..."
         )
 
+        sent_messages = []
+
         sent_count = 0
 
         # SEND VIDEOS
@@ -144,12 +157,14 @@ async def send_videos(client, message):
 
             try:
 
-                await app.copy_message(
+                sent = await app.copy_message(
                     chat_id=message.chat.id,
                     from_chat_id=video["channel"],
                     message_id=video["msg_id"],
                     protect_content=True
                 )
+
+                sent_messages.append(sent)
 
                 sent_count += 1
 
@@ -167,6 +182,16 @@ async def send_videos(client, message):
         # INCREASE LIMIT
         await increase_limit(user_id)
 
+        # SAVE TOTAL RECEIVED
+        await users.update_one(
+            {"user_id": user_id},
+            {
+                "$inc": {
+                    "total_received": sent_count
+                }
+            }
+        )
+
         # SUCCESS MESSAGE
         await status.edit_text(
             f"""
@@ -177,12 +202,32 @@ async def send_videos(client, message):
 🎬 Successfully Sent :
 {sent_count} Premium Videos
 
+📦 Total Received :
+{user.get('total_received', 0) + sent_count}
+
 ⚠️ Videos Will Auto Delete
 After 24 Hours
 
 🔥 Enjoy Premium Access
 """
         )
+
+        # AUTO DELETE AFTER 24 HOURS
+        await asyncio.sleep(86400)
+
+        for msg in sent_messages:
+
+            try:
+                await msg.delete()
+
+            except:
+                pass
+
+        try:
+            await status.delete()
+
+        except:
+            pass
 
     finally:
 
