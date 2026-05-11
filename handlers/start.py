@@ -34,7 +34,7 @@ async def start(client, message):
         [InlineKeyboardButton("🎁 FREE DEMO", callback_data="demo")],
         [InlineKeyboardButton("💳 BUY PREMIUM", callback_data="buy")],
         [InlineKeyboardButton("📊 MY PLAN", callback_data="myplan")],
-        [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/courses_hub2_bot")]
+        [InlineKeyboardButton("☎ SUPPORT", url="http://t.me/Contact_45bot")]
     ])
 
     await message.reply_photo(
