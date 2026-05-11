@@ -12,7 +12,7 @@ START_TEXT = """
 ╚════════════════╝
 
 🔥 Unlimited Random Videos
-⚡ Daily 100 Videos
+⚡ Daily 200 Videos
 🛡 Protected Content
 💎 Monthly VIP Access
 """
