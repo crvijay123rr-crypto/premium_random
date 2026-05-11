@@ -1,6 +1,6 @@
 from pyrogram import filters
 
-from main import app
+from bot import app
 from admin.admin import admin_filter
 
 from database.videos_db import delete_video
