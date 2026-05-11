@@ -1,6 +1,6 @@
 from pyrogram import filters
 
-from main import app
+from bot import app
 from admin.admin import admin_filter
 
 from database.users_db import unban_user
