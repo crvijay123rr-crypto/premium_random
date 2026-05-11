@@ -1,6 +1,6 @@
 from pyrogram import filters
 
-from bot import app
+from bot import app, userbot
 from config import PREMIUM_CHANNEL
 
 from admin.admin import admin_filter
@@ -17,10 +17,8 @@ async def sync_channel(client, message):
         "🔄 Sync Started..."
     )
 
-    # LOAD CHANNEL
-    await app.get_chat(PREMIUM_CHANNEL)
-
-    async for msg in app.get_chat_history(PREMIUM_CHANNEL):
+    # USERBOT HISTORY READ
+    async for msg in userbot.get_chat_history(PREMIUM_CHANNEL):
 
         try:
 
@@ -32,6 +30,8 @@ async def sync_channel(client, message):
                 )
 
                 count += 1
+
+                print(f"Synced: {msg.id}")
 
         except Exception as e:
 
