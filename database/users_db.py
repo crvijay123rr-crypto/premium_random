@@ -176,46 +176,4 @@ async def is_premium(user_id):
 
         return False
 
-    return True            "$set": {
-                "banned": True
-            }
-        }
-    )
-
-
-# UNBAN USER
-async def unban_user(user_id):
-
-    await users.update_one(
-        {"user_id": user_id},
-        {
-            "$set": {
-                "banned": False
-            }
-        }
-    )
-
-
-# CHECK PREMIUM
-async def is_premium(user_id):
-
-    user = await get_user(user_id)
-
-    # USER NOT FOUND
-    if not user:
-        return False
-
-    # PREMIUM CHECK
-    if not user.get("premium", False):
-        return False
-
-    expiry = user.get("expiry")
-
-    # EXPIRED
-    if expiry and expiry < datetime.utcnow():
-
-        await remove_premium(user_id)
-
-        return False
-
     return True
