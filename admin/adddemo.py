@@ -11,33 +11,26 @@ async def adddemo(client, message):
 
     reply = message.reply_to_message
 
-    # CHECK REPLY
     if not reply:
-
         return await message.reply_text(
-            "⚠️ Reply To A Demo Video"
+            "⚠️ Reply To Demo Video"
         )
 
-    # ONLY VIDEO ALLOWED
-    if not reply.video:
-
+    # CHECK VIDEO
+    if not (
+        reply.video
+        or reply.document
+        or reply.animation
+    ):
         return await message.reply_text(
-            "❌ Only Video Messages Allowed"
+            "❌ Only Video Files Allowed"
         )
 
-    # SAVE DEMO VIDEO
     await add_demo(
         reply.chat.id,
         reply.id
     )
 
-    # SUCCESS MESSAGE
     await message.reply_text(
-        """
-╔════════════════════╗
-    ✅ DEMO ADDED ✅
-╚════════════════════╝
-
-🎁 Demo Video Saved Successfully
-"""
+        "✅ Demo Video Added"
     )
