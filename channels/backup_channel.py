@@ -1,0 +1,8 @@
+# OPTIONAL BACKUP CHANNEL
+
+BACKUP_CHANNEL = None
+
+# GET BACKUP CHANNEL
+def get_backup_channel():
+
+    return BACKUP_CHANNEL
