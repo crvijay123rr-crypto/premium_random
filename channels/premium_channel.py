@@ -1,0 +1,9 @@
+from config import PREMIUM_CHANNEL
+
+# PREMIUM CHANNEL ID
+PREMIUM_STORAGE = PREMIUM_CHANNEL
+
+# GET PREMIUM CHANNEL
+def get_premium_channel():
+
+    return PREMIUM_STORAGE
