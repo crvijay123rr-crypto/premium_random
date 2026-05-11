@@ -91,19 +91,38 @@ async def demo(client, message):
     await increase_demo(user_id)
 
     # SUCCESS MESSAGE
-    await message.reply_text(
-        f"✅ Sent {sent_count} Demo Videos"
-    )
+await message.reply_text(
+    f"✅ Sent {sent_count} Demo Videos"
+)
 
-    # WARNING MESSAGE
-    warning_msg = await message.reply_text(
-        "⚠️ These were only demo videos.\n\n"
-        "🗑 All demo videos will be deleted automatically in 2 minutes.\n\n"
-        "💎 Buy Premium For Unlimited Access."
-    )
+# WARNING MESSAGE
+warning_msg = await message.reply_text(
+    """
+╔════════════════════╗
+       ⚠️ DEMO NOTICE ⚠️
+╚════════════════════╝
 
-    # WAIT 2 MINUTES
-    await asyncio.sleep(120)
+🎥 These Were Only Demo Videos
+
+🗑 All Demo Videos Will Be
+Deleted Automatically In 2 Minutes
+
+━━━━━━━━━━━━━━━━━━━
+
+💎 Buy Premium For
+Unlimited Full Access
+
+📩 DM FAST :
+@Contact_45bot
+
+━━━━━━━━━━━━━━━━━━━
+
+🚀 Unlock Premium Instantly
+"""
+)
+
+# WAIT 2 MINUTES
+await asyncio.sleep(120)
 
     # DELETE ALL DEMO VIDEOS
     for msg in sent_messages:
