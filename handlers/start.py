@@ -12,9 +12,9 @@ START_TEXT = """
 ╚════════════════╝
 
 🔥 Unlimited Random Videos
-⚡ Daily 200 Videos
+⚡ Daily 100 Videos
 🛡 Protected Content
-💎 Monthly VIP Access
+💎 Monthly VIP Access 🎥videos saved your database only 30 days 
 """
 
 START_PIC = "assets/banner.jpg"
