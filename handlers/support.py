@@ -9,7 +9,7 @@ async def support(client, message):
 ☎ SUPPORT
 
 👤 Admin :
-@yourusername
+@Contact_45bot
 """
 
     await message.reply_text(text)# Support handler
