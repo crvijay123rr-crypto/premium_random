@@ -11,33 +11,26 @@ async def addvideo(client, message):
 
     reply = message.reply_to_message
 
-    # CHECK REPLY
     if not reply:
-
         return await message.reply_text(
-            "⚠️ Reply To A Video Message"
+            "⚠️ Reply To A Video"
         )
 
-    # ONLY VIDEO ALLOWED
-    if not reply.video:
-
+    # CHECK VIDEO
+    if not (
+        reply.video
+        or reply.document
+        or reply.animation
+    ):
         return await message.reply_text(
-            "❌ Only Video Messages Allowed"
+            "❌ Only Video Files Allowed"
         )
 
-    # SAVE VIDEO
     await add_video(
         reply.chat.id,
         reply.id
     )
 
-    # SUCCESS
     await message.reply_text(
-        """
-╔════════════════════╗
-     ✅ VIDEO ADDED ✅
-╚════════════════════╝
-
-🎬 Premium Video Saved Successfully
-"""
+        "✅ Premium Video Added"
     )
