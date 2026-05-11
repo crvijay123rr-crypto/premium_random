@@ -1,6 +1,6 @@
 from pyrogram import filters
 
-from main import app
+from bot import app
 from config import PLAN_PRICE
 
 @app.on_message(filters.command("buy"))
