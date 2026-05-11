@@ -22,6 +22,9 @@ async def sync_channel(client, message):
         "⚡ Ultra Fast Sync Started..."
     )
 
+    # LOAD CHAT
+    chat = await userbot.get_chat(PREMIUM_CHANNEL)
+
     # OLD DATABASE IDS
     old_videos = await get_all_videos()
 
@@ -31,7 +34,7 @@ async def sync_channel(client, message):
         old_ids.add(x["msg_id"])
 
     # HISTORY SCAN
-    async for msg in userbot.get_chat_history(PREMIUM_CHANNEL):
+    async for msg in userbot.get_chat_history(chat.id):
 
         total += 1
 
@@ -48,13 +51,13 @@ async def sync_channel(client, message):
 
             # SAVE VIDEO
             await add_video(
-                PREMIUM_CHANNEL,
+                chat.id,
                 msg.id
             )
 
             synced += 1
 
-            # ADD TO CACHE
+            # CACHE UPDATE
             old_ids.add(msg.id)
 
             # LIVE PROGRESS
