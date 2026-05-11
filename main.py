@@ -8,22 +8,39 @@ app = Client(
     bot_token=BOT_TOKEN
 )
 
-import handlers.start
-import handlers.videos
-import handlers.demo
-import handlers.buy
-import handlers.myplan
-import handlers.support
-import handlers.referral
-import handlers.redeem
-import handlers.callbacks
-import handlers.force_sub
+try:
+    import handlers.start
+    print("start loaded")
 
-import admin.admin
-import admin.broadcast
-import admin.stats
-import admin.ban
-import admin.unban
+    import handlers.videos
+    print("videos loaded")
+
+    import handlers.demo
+    print("demo loaded")
+
+    import handlers.buy
+    print("buy loaded")
+
+    import handlers.myplan
+    print("myplan loaded")
+
+    import handlers.support
+    print("support loaded")
+
+    import handlers.referral
+    print("referral loaded")
+
+    import handlers.redeem
+    print("redeem loaded")
+
+    import handlers.callbacks
+    print("callbacks loaded")
+
+    import handlers.force_sub
+    print("force_sub loaded")
+
+except Exception as e:
+    print(e)
 
 print("BOT STARTED")
 
