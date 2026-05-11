@@ -2,7 +2,7 @@ import random
 
 from pyrogram import filters
 
-from main import app
+from bot import app
 from config import DAILY_LIMIT
 
 from database.users_db import (
