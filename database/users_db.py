@@ -1,6 +1,7 @@
 from database.mongo import users
 from datetime import datetime, timedelta
 
+
 # ADD USER
 async def add_user(user_id):
 
@@ -8,17 +9,21 @@ async def add_user(user_id):
         "user_id": user_id
     })
 
-    if not user:
+    # USER ALREADY EXISTS
+    if user:
+        return
 
-        await users.insert_one({
-            "user_id": user_id,
-            "premium": False,
-            "expiry": None,
-            "used_today": 0,
-            "demo_used": 0,
-            "banned": False,
-            "joined": datetime.utcnow()
-        })
+    # INSERT NEW USER
+    await users.insert_one({
+        "user_id": user_id,
+        "premium": False,
+        "expiry": None,
+        "used_today": 0,
+        "demo_used": 0,
+        "banned": False,
+        "joined": datetime.utcnow()
+    })
+
 
 # GET USER
 async def get_user(user_id):
@@ -26,6 +31,7 @@ async def get_user(user_id):
     return await users.find_one({
         "user_id": user_id
     })
+
 
 # ACTIVATE PREMIUM
 async def activate_premium(user_id, days=30):
@@ -43,6 +49,7 @@ async def activate_premium(user_id, days=30):
         }
     )
 
+
 # REMOVE PREMIUM
 async def remove_premium(user_id):
 
@@ -56,6 +63,7 @@ async def remove_premium(user_id):
         }
     )
 
+
 # DAILY LIMIT INCREASE
 async def increase_limit(user_id):
 
@@ -67,6 +75,7 @@ async def increase_limit(user_id):
             }
         }
     )
+
 
 # DEMO LIMIT INCREASE
 async def increase_demo(user_id):
@@ -80,6 +89,7 @@ async def increase_demo(user_id):
         }
     )
 
+
 # RESET DAILY LIMIT
 async def reset_daily_limit():
 
@@ -91,6 +101,7 @@ async def reset_daily_limit():
             }
         }
     )
+
 
 # BAN USER
 async def ban_user(user_id):
@@ -104,6 +115,7 @@ async def ban_user(user_id):
         }
     )
 
+
 # UNBAN USER
 async def unban_user(user_id):
 
@@ -116,23 +128,27 @@ async def unban_user(user_id):
         }
     )
 
+
 # CHECK PREMIUM
 async def is_premium(user_id):
 
     user = await get_user(user_id)
 
+    # USER NOT FOUND
     if not user:
         return False
 
-    if not user["premium"]:
+    # PREMIUM CHECK
+    if not user.get("premium", False):
         return False
 
     expiry = user.get("expiry")
 
+    # EXPIRED
     if expiry and expiry < datetime.utcnow():
 
         await remove_premium(user_id)
 
         return False
 
-    return True# Users DB functions
+    return True
