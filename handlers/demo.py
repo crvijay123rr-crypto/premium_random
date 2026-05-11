@@ -2,6 +2,7 @@ import asyncio
 import random
 
 from pyrogram import filters
+from pyrogram.errors import FloodWait
 
 from bot import app
 
@@ -24,6 +25,7 @@ async def demo(client, message):
     # ADD USER
     await add_user(user_id)
 
+    # GET USER
     user = await get_user(user_id)
 
     # DEMO LIMIT
@@ -42,31 +44,44 @@ async def demo(client, message):
             "❌ No Demo Videos"
         )
 
-    # RANDOMIZE
+    # RANDOMIZE VIDEOS
     random.shuffle(demo_videos)
 
+    # SELECT 50 VIDEOS
     selected = demo_videos[:50]
 
     await message.reply_text(
         f"🎬 Sending {len(selected)} Demo Videos..."
     )
 
+    sent_messages = []
+
     sent_count = 0
 
+    # SEND VIDEOS
     for video in selected:
 
         try:
 
-            await app.copy_message(
+            sent = await app.copy_message(
                 chat_id=message.chat.id,
                 from_chat_id=video["channel"],
                 message_id=video["msg_id"],
                 protect_content=True
             )
 
+            sent_messages.append(sent)
+
             sent_count += 1
 
+            # SMALL DELAY
             await asyncio.sleep(1)
+
+        except FloodWait as e:
+
+            print(f"FloodWait: {e.value}")
+
+            await asyncio.sleep(e.value)
 
         except Exception as e:
 
@@ -75,6 +90,33 @@ async def demo(client, message):
     # INCREASE DEMO LIMIT
     await increase_demo(user_id)
 
+    # SUCCESS MESSAGE
     await message.reply_text(
         f"✅ Sent {sent_count} Demo Videos"
     )
+
+    # WARNING MESSAGE
+    warning_msg = await message.reply_text(
+        "⚠️ These were only demo videos.\n\n"
+        "🗑 All demo videos will be deleted automatically in 2 minutes.\n\n"
+        "💎 Buy Premium For Unlimited Access."
+    )
+
+    # WAIT 2 MINUTES
+    await asyncio.sleep(120)
+
+    # DELETE ALL DEMO VIDEOS
+    for msg in sent_messages:
+
+        try:
+            await msg.delete()
+
+        except Exception as e:
+            print(e)
+
+    # DELETE WARNING MESSAGE
+    try:
+        await warning_msg.delete()
+
+    except:
+        pass
