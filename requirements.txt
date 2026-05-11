@@ -1,0 +1,6 @@
+pyrogram
+TgCrypto
+motor
+python-dotenv
+apscheduler
+pytz
