@@ -30,16 +30,37 @@ async def send_videos(client, message):
     await add_user(user_id)
 
     # PREMIUM CHECK
-    premium = await is_premium(user_id)
+premium = await is_premium(user_id)
 
-    if not premium:
+if not premium:
 
-        return await message.reply_text(
-            "❌ Buy Premium First"
-        )
+    return await message.reply_text(
+        """
+╔════════════════════╗
+      ❌ ACCESS DENIED ❌
+╚════════════════════╝
 
-    # GET USER
-    user = await get_user(user_id)
+👑 Premium Membership Required
+
+🔥 Unlock Unlimited Premium Videos
+⚡ Daily 100 Videos Access
+🛡 Protected Content Enabled
+
+━━━━━━━━━━━━━━━━━━━
+
+💎 Buy Premium First
+
+📩 DM FAST :
+@Contact_45bot
+
+━━━━━━━━━━━━━━━━━━━
+
+🚀 Get Instant Premium Access Now
+"""
+    )
+
+# GET USER
+user = await get_user(user_id)
 
     # DAILY LIMIT
     if user.get("used_today", 0) >= DAILY_LIMIT:
