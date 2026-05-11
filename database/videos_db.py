@@ -1,1 +1,54 @@
-# Videos DB functions
+from database.mongo import videos
+
+# ADD PREMIUM VIDEO
+async def add_video(channel, msg_id):
+
+    await videos.insert_one({
+        "channel": channel,
+        "msg_id": msg_id,
+        "demo": False
+    })
+
+# ADD DEMO VIDEO
+async def add_demo(channel, msg_id):
+
+    await videos.insert_one({
+        "channel": channel,
+        "msg_id": msg_id,
+        "demo": True
+    })
+
+# GET ALL PREMIUM VIDEOS
+async def get_all_videos():
+
+    return await videos.find({
+        "demo": False
+    }).to_list(length=None)
+
+# GET ALL DEMO VIDEOS
+async def get_demo_videos():
+
+    return await videos.find({
+        "demo": True
+    }).to_list(length=None)
+
+# DELETE VIDEO
+async def delete_video(msg_id):
+
+    await videos.delete_one({
+        "msg_id": msg_id
+    })
+
+# TOTAL VIDEOS
+async def total_videos():
+
+    return await videos.count_documents({
+        "demo": False
+    })
+
+# TOTAL DEMO VIDEOS
+async def total_demo():
+
+    return await videos.count_documents({
+        "demo": True
+    })# Videos DB functions
