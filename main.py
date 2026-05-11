@@ -3,7 +3,7 @@ from pyrogram import filters
 from bot import app, userbot
 
 # START USERBOT
-userbot.start()
+#userbot.start()
 
 # USER HANDLERS
 import handlers.start
