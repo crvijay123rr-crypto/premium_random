@@ -1,4 +1,4 @@
-from pyrogram import Client
+from pyrogram import Client, filters
 from config import *
 
 app = Client(
@@ -41,6 +41,12 @@ try:
 
 except Exception as e:
     print(e)
+
+
+@app.on_message(filters.all)
+async def all_messages(client, message):
+    print("MESSAGE RECEIVED:", message.text)
+
 
 print("BOT STARTED")
 
