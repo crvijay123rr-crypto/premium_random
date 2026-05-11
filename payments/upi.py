@@ -1,30 +1,60 @@
 from config import PLAN_PRICE
 
 # UPI DETAILS
-UPI_ID = "yourupi@upi"
+UPI_ID = "phone pay gift card payment"
 
 # PAYMENT TEXT
 def payment_text(user_id):
 
     return f"""
-╔════════════════╗
-    💎 PREMIUM PLAN 💎
-╚════════════════╝
+╔══════════════════════╗
+        👑 PREMIUM VIP 👑
+╚══════════════════════╝
 
-📅 Duration : 30 Days
-🎥 Daily Limit : 100 Videos
+🔥 Unlock Premium Access Instantly
+
+━━━━━━━━━━━━━━━━━━━
+
+📅 Plan Duration : 30 Days
+🎥 Daily Videos : 100
+🛡 Protected Content
+⚡ Ultra Fast Access
+
+━━━━━━━━━━━━━━━━━━━
 
 💰 Price : ₹{PLAN_PRICE}
 
-🟢 Pay UPI :
-{UPI_ID}
+💳 PAYMENT METHODS ACCEPTED :
 
-⚠️ After Payment Send Screenshot
+✅ UPI Payment
+✅ PhonePe
+✅ Google Pay
+✅ Paytm
+✅ Gift Cards
 
-🆔 USER ID :
-{user_id}
+━━━━━━━━━━━━━━━━━━━
+
+💎 UPI ID :
+`{UPI_ID}`
+
+━━━━━━━━━━━━━━━━━━━
+
+⚠️ AFTER PAYMENT
+
+📸 Send Payment Screenshot
+🆔 Send Your User ID
+
+🤖 Need Help / Contact :
+https://t.me/Contact_45bot
+
+━━━━━━━━━━━━━━━━━━━
+
+🆔 YOUR USER ID :
+`{user_id}`
+
+🔥 Enjoy Unlimited Premium Experience
 """
-
+    
 # UPI LINK
 def upi_link(user_id):
 
