@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from main import app
+from bot import app
 from database.users_db import add_user
 
 START_TEXT = """
