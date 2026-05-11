@@ -2,7 +2,7 @@ from pyrogram import filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from main import app
+from bot import app
 from config import FORCE_SUB
 
 
