@@ -5,6 +5,7 @@ from admin.admin import admin_filter
 
 from database.users_db import remove_premium
 
+
 @app.on_message(filters.command("removepremium") & admin_filter)
 async def removepremium(client, message):
 
@@ -13,11 +14,11 @@ async def removepremium(client, message):
 
     except:
         return await message.reply_text(
-            "/removepremium user_id"
+            "❌ Usage : /removepremium user_id"
         )
 
     await remove_premium(user_id)
 
     await message.reply_text(
-        "✅ Premium Removed"
+        "✅ Premium Removed Successfully"
     )
