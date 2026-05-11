@@ -1,5 +1,6 @@
 import asyncio
 import random
+from datetime import datetime
 
 from pyrogram import filters
 from pyrogram.errors import FloodWait
@@ -11,6 +12,8 @@ from database.users_db import (
     increase_demo,
     add_user
 )
+
+from database.mongo import users
 
 from database.videos_db import (
     get_demo_videos
@@ -42,29 +45,38 @@ async def demo(client, message):
         # GET USER
         user = await get_user(user_id)
 
-        # DEMO LIMIT
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+
+        last_demo = user.get("last_demo_date")
+
+        # RESET DAILY DEMO
+        if last_demo != today:
+
+            await users.update_one(
+                {"user_id": user_id},
+                {
+                    "$set": {
+                        "demo_used": 0,
+                        "last_demo_date": today
+                    }
+                }
+            )
+
+            user["demo_used"] = 0
+
+        # DAILY DEMO LIMIT
         if user.get("demo_used", 0) >= 1:
 
             return await message.reply_text(
                 """
 ╔════════════════════╗
-      ❌ DEMO FINISHED ❌
+      ❌ DEMO USED ❌
 ╚════════════════════╝
 
-⚠️ Your Free Demo Limit
-Has Been Completed
+⚠️ You Already Used
+Today's Free Demo
 
-━━━━━━━━━━━━━━━━━━━
-
-💎 Buy Premium For
-Unlimited Access
-
-📩 DM FAST :
-@Contact_45bot
-
-━━━━━━━━━━━━━━━━━━━
-
-🚀 Unlock Premium Instantly
+⏳ Try Again Tomorrow
 """
             )
 
@@ -107,7 +119,6 @@ Unlimited Access
 
                 sent_count += 1
 
-                # FAST SAFE DELAY
                 await asyncio.sleep(0.3)
 
             except FloodWait as e:
@@ -118,7 +129,7 @@ Unlimited Access
 
                 print(e)
 
-        # INCREASE DEMO
+        # INCREASE DEMO COUNT
         await increase_demo(user_id)
 
         # SUCCESS MESSAGE
@@ -131,30 +142,17 @@ Unlimited Access
 🎬 Successfully Sent :
 {sent_count} Demo Videos
 
-━━━━━━━━━━━━━━━━━━━
-
-⚠️ All Videos Will Be
-Deleted Automatically
+⚠️ Videos Will Auto Delete
 In 2 Minutes
 
-━━━━━━━━━━━━━━━━━━━
-
-💎 Buy Premium For
-Unlimited Full Access
-
-📩 DM FAST :
-@Contact_45bot
-
-━━━━━━━━━━━━━━━━━━━
-
-🚀 Unlock Premium Instantly
+🚀 Come Back Tomorrow
+For Next Free Demo
 """
         )
 
-        # WAIT 2 MINUTES
+        # AUTO DELETE
         await asyncio.sleep(120)
 
-        # DELETE DEMO VIDEOS
         for msg in sent_messages:
 
             try:
@@ -163,7 +161,6 @@ Unlimited Full Access
             except:
                 pass
 
-        # DELETE STATUS MESSAGE
         try:
             await status.delete()
 
@@ -172,5 +169,4 @@ Unlimited Full Access
 
     finally:
 
-        # REMOVE LOCK
         demo_locks.pop(user_id, None)
