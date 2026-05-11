@@ -37,7 +37,10 @@ import admin.stats
 import admin.sync_channel
 import admin.sync_demo
 import admin.syncnew
-
+import admin.users
+import admin.premiums
+import admin.removepremium
+import admin.restart
 
 print("🚀 BOT STARTED SUCCESSFULLY")
 
