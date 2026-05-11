@@ -15,20 +15,24 @@ START_TEXT = """
 💎 Monthly VIP Access
 """
 
+
 @app.on_message(filters.command("start"))
 async def start(client, message):
 
-    await add_user(message.from_user.id)
+    try:
+        await add_user(message.from_user.id)
+    except Exception as e:
+        print(f"ADD USER ERROR: {e}")
 
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("🎥 GET VIDEOS", callback_data="videos")],
         [InlineKeyboardButton("🎁 FREE DEMO", callback_data="demo")],
         [InlineKeyboardButton("💳 BUY PREMIUM", callback_data="buy")],
         [InlineKeyboardButton("📊 MY PLAN", callback_data="myplan")],
-        [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/yourusername")]
+        [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/courses_hub2_bot")]
     ])
 
     await message.reply_text(
         START_TEXT,
         reply_markup=buttons
-    )# Start handler
+    )
