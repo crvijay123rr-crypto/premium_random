@@ -11,6 +11,7 @@ app = Client(
 
 with app:
 
-    chat = app.get_chat(-1003839420742)
+    # PUBLIC USERNAME
+    chat = app.get_chat("pppppppppppptyy")
 
     print(chat.title)
