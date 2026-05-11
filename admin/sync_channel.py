@@ -5,7 +5,10 @@ from config import PREMIUM_CHANNEL
 
 from admin.admin import admin_filter
 
-from database.videos_db import add_video
+from database.videos_db import (
+    add_video,
+    get_all_videos
+)
 
 
 @app.on_message(filters.command("sync") & admin_filter)
@@ -17,12 +20,21 @@ async def sync_channel(client, message):
         "🔄 Sync Started..."
     )
 
+    # OLD VIDEOS LOAD
+    old_videos = await get_all_videos()
+
+    old_ids = [x["msg_id"] for x in old_videos]
+
     # USERBOT HISTORY READ
     async for msg in userbot.get_chat_history(PREMIUM_CHANNEL):
 
         try:
 
             if msg.video:
+
+                # SKIP DUPLICATE
+                if msg.id in old_ids:
+                    continue
 
                 await add_video(
                     PREMIUM_CHANNEL,
@@ -31,7 +43,9 @@ async def sync_channel(client, message):
 
                 count += 1
 
-                print(f"Synced: {msg.id}")
+                # PROGRESS
+                if count % 100 == 0:
+                    print(f"{count} videos synced")
 
         except Exception as e:
 
