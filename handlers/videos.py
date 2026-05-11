@@ -1,5 +1,6 @@
 import asyncio
-import random
+
+from datetime import datetime
 
 from pyrogram import filters
 from pyrogram.errors import FloodWait
@@ -14,6 +15,8 @@ from database.users_db import (
     add_user
 )
 
+from database.mongo import users
+
 from database.videos_db import (
     get_all_videos
 )
@@ -24,7 +27,6 @@ async def send_videos(client, message):
 
     user_id = message.from_user.id
 
-    # ADD USER
     await add_user(user_id)
 
     # PREMIUM CHECK
@@ -39,14 +41,13 @@ async def send_videos(client, message):
     # GET USER
     user = await get_user(user_id)
 
-    # DAILY LIMIT CHECK
+    # DAILY LIMIT
     if user.get("used_today", 0) >= DAILY_LIMIT:
 
         return await message.reply_text(
             "❌ Daily Limit Reached"
         )
 
-    # GET ALL VIDEOS
     all_videos = await get_all_videos()
 
     if not all_videos:
@@ -55,38 +56,80 @@ async def send_videos(client, message):
             "❌ No Videos Found"
         )
 
-    # RANDOMIZE VIDEOS
-    random.shuffle(all_videos)
+    today = datetime.utcnow().strftime("%Y-%m-%d")
 
-    # SELECT 100 VIDEOS
-    selected_videos = all_videos[:100]
+    last_date = user.get("last_video_date")
+
+    current_index = user.get("video_index", 0)
+
+    # SAME DAY = SAME VIDEOS
+    if last_date == today:
+
+        start = current_index
+        end = start + 100
+
+    else:
+
+        # NEXT DAY START FROM NEXT 100
+        start = current_index
+        end = start + 100
+
+        # SAVE NEXT POSITION
+        await users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "last_video_date": today,
+                    "video_index": end
+                }
+            }
+        )
+
+    selected_videos = all_videos[start:end]
+
+    # RESET IF END REACHED
+    if not selected_videos:
+
+        start = 0
+        end = 100
+
+        selected_videos = all_videos[start:end]
+
+        await users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "video_index": end
+                }
+            }
+        )
 
     await message.reply_text(
         f"🎬 Sending {len(selected_videos)} Premium Videos..."
     )
 
+    sent_messages = []
+
     sent_count = 0
 
-    # SEND VIDEOS
     for video in selected_videos:
 
         try:
 
-            await app.copy_message(
+            sent = await app.copy_message(
                 chat_id=message.chat.id,
                 from_chat_id=video["channel"],
                 message_id=video["msg_id"],
                 protect_content=True
             )
 
+            sent_messages.append(sent)
+
             sent_count += 1
 
-            # SMALL DELAY
             await asyncio.sleep(1)
 
         except FloodWait as e:
-
-            print(f"FloodWait: {e.value}")
 
             await asyncio.sleep(e.value)
 
@@ -94,10 +137,25 @@ async def send_videos(client, message):
 
             print(e)
 
-    # INCREASE LIMIT
     await increase_limit(user_id)
 
-    # DONE MESSAGE
-    await message.reply_text(
-        f"✅ Successfully Sent {sent_count} Videos"
+    warning = await message.reply_text(
+        "⚠️ Premium videos will auto delete after 24 hours."
     )
+
+    # DELETE AFTER 24 HOURS
+    await asyncio.sleep(86400)
+
+    for msg in sent_messages:
+
+        try:
+            await msg.delete()
+
+        except:
+            pass
+
+    try:
+        await warning.delete()
+
+    except:
+        pass
