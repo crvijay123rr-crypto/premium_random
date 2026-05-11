@@ -1,6 +1,6 @@
 from pyrogram import filters
 
-from main import app
+from bot import app
 
 @app.on_message(filters.command("support"))
 async def support(client, message):
