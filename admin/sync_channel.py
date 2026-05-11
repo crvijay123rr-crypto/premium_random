@@ -14,43 +14,77 @@ from database.videos_db import (
 @app.on_message(filters.command("sync") & admin_filter)
 async def sync_channel(client, message):
 
-    count = 0
+    synced = 0
+    skipped = 0
+    total = 0
 
-    await message.reply_text(
-        "🔄 Sync Started..."
+    start_msg = await message.reply_text(
+        "⚡ Ultra Fast Sync Started..."
     )
 
-    # OLD VIDEOS LOAD
+    # OLD DATABASE IDS
     old_videos = await get_all_videos()
 
-    old_ids = [x["msg_id"] for x in old_videos]
+    old_ids = set()
 
-    # USERBOT HISTORY READ
+    for x in old_videos:
+        old_ids.add(x["msg_id"])
+
+    # HISTORY SCAN
     async for msg in userbot.get_chat_history(PREMIUM_CHANNEL):
+
+        total += 1
 
         try:
 
-            if msg.video:
+            if not msg.video:
+                continue
 
-                # SKIP DUPLICATE
-                if msg.id in old_ids:
-                    continue
+            # DUPLICATE SKIP
+            if msg.id in old_ids:
 
-                await add_video(
-                    PREMIUM_CHANNEL,
-                    msg.id
-                )
+                skipped += 1
+                continue
 
-                count += 1
+            # SAVE VIDEO
+            await add_video(
+                PREMIUM_CHANNEL,
+                msg.id
+            )
 
-                # PROGRESS
-                if count % 100 == 0:
-                    print(f"{count} videos synced")
+            synced += 1
+
+            # ADD TO CACHE
+            old_ids.add(msg.id)
+
+            # LIVE PROGRESS
+            if synced % 100 == 0:
+
+                try:
+
+                    await start_msg.edit_text(
+                        f"""
+⚡ ULTRA FAST SYNC
+
+✅ Synced : {synced}
+⏭ Skipped : {skipped}
+📂 Checked : {total}
+"""
+                    )
+
+                except:
+                    pass
 
         except Exception as e:
 
-            print(e)
+            print(f"ERROR : {e}")
 
-    await message.reply_text(
-        f"✅ Synced {count} Videos"
+    await start_msg.edit_text(
+        f"""
+✅ ULTRA SYNC COMPLETED
+
+📥 Total Synced : {synced}
+⏭ Total Skipped : {skipped}
+📂 Total Checked : {total}
+"""
     )
