@@ -3,7 +3,7 @@ import random
 
 from pyrogram import filters
 
-from main import app
+from bot import app
 
 from database.users_db import (
     get_user,
