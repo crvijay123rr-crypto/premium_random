@@ -46,7 +46,7 @@ Active Premium Plan
 ━━━━━━━━━━━━━━━━━━━
 
 🎥 Videos Used Today :
-{user.get('used_today', 0)}/100
+{user.get('used_today', 0)}/1
 
 📦 Total Videos Received :
 {total_received}
