@@ -150,9 +150,19 @@ For Next Free Demo
 """
         )
 
-        # AUTO DELETE
+        # PIN SUCCESS MESSAGE
+        try:
+            await status.pin(
+                disable_notification=True
+            )
+
+        except:
+            pass
+
+        # AUTO DELETE AFTER 2 MINUTES
         await asyncio.sleep(120)
 
+        # DELETE VIDEOS
         for msg in sent_messages:
 
             try:
@@ -161,6 +171,14 @@ For Next Free Demo
             except:
                 pass
 
+        # UNPIN MESSAGE
+        try:
+            await status.unpin()
+
+        except:
+            pass
+
+        # DELETE STATUS MESSAGE
         try:
             await status.delete()
 
@@ -169,4 +187,5 @@ For Next Free Demo
 
     finally:
 
+        # REMOVE LOCK
         demo_locks.pop(user_id, None)
