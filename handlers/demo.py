@@ -209,6 +209,19 @@ For Next Free Demo
 @app.on_message(filters.command("resetdemo"))
 async def reset_demo_command(client, message):
 
+    reset_msg = await message.reply_text(
+        """
+╔══════════════════════╗
+       ♻️ RESETTING ♻️
+╚══════════════════════╝
+
+⚡ Resetting All Users
+Free Demo Access...
+
+📡 Sending Notifications...
+"""
+    )
+
     # RESET ALL USERS
     await users.update_many(
         {},
@@ -224,8 +237,9 @@ async def reset_demo_command(client, message):
     all_users = users.find({})
 
     sent = 0
+    failed = 0
 
-    # SEND MESSAGE TO ALL USERS
+    # BROADCAST MESSAGE
     async for user in all_users:
 
         try:
@@ -233,15 +247,18 @@ async def reset_demo_command(client, message):
             await app.send_message(
                 chat_id=user["user_id"],
                 text="""
-╔════════════════════╗
-    🎉 DEMO RESET DONE
-╚════════════════════╝
+╔══════════════════════╗
+      🎉 DEMO RESET 🎉
+╚══════════════════════╝
 
 🔥 Your Free Demo
-Has Been Reset
+Has Been Reset Successfully
 
 🎬 Use /demo Now
-And Enjoy New Videos
+And Enjoy Fresh Content
+
+⚡ Hurry Before
+Daily Limit Ends
 """
             )
 
@@ -250,18 +267,26 @@ And Enjoy New Videos
             await asyncio.sleep(0.1)
 
         except:
-            pass
 
-    # SUCCESS MESSAGE
-    await message.reply_text(
+            failed += 1
+
+    # FINAL STATUS
+    await reset_msg.edit_text(
         f"""
-╔════════════════════╗
-    ✅ RESET COMPLETED
-╚════════════════════╝
+╔══════════════════════╗
+      ✅ RESET DONE ✅
+╚══════════════════════╝
 
 🎬 All Demo Users Reset
+Successfully
 
-📢 Message Sent To:
-{sent} Users
+📢 Notifications Sent :
+{sent}
+
+❌ Failed Users :
+{failed}
+
+🚀 Everyone Can Use
+/demo Again
 """
-            )
+    )
