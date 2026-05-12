@@ -22,6 +22,9 @@ from database.videos_db import (
 demo_locks = {}
 
 
+# =========================
+# DEMO COMMAND
+# =========================
 @app.on_message(filters.command("demo"))
 async def demo(client, message):
 
@@ -198,3 +201,67 @@ For Next Free Demo
 
         # REMOVE LOCK
         demo_locks.pop(user_id, None)
+
+
+# =========================
+# RESET DEMO COMMAND
+# =========================
+@app.on_message(filters.command("resetdemo"))
+async def reset_demo_command(client, message):
+
+    # RESET ALL USERS
+    await users.update_many(
+        {},
+        {
+            "$set": {
+                "demo_used": 0,
+                "last_demo_date": None
+            }
+        }
+    )
+
+    # GET ALL USERS
+    all_users = users.find({})
+
+    sent = 0
+
+    # SEND MESSAGE TO ALL USERS
+    async for user in all_users:
+
+        try:
+
+            await app.send_message(
+                chat_id=user["user_id"],
+                text="""
+╔════════════════════╗
+    🎉 DEMO RESET DONE
+╚════════════════════╝
+
+🔥 Your Free Demo
+Has Been Reset
+
+🎬 Use /demo Now
+And Enjoy New Videos
+"""
+            )
+
+            sent += 1
+
+            await asyncio.sleep(0.1)
+
+        except:
+            pass
+
+    # SUCCESS MESSAGE
+    await message.reply_text(
+        f"""
+╔════════════════════╗
+    ✅ RESET COMPLETED
+╚════════════════════╝
+
+🎬 All Demo Users Reset
+
+📢 Message Sent To:
+{sent} Users
+"""
+            )
