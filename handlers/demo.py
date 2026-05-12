@@ -9,7 +9,6 @@ from bot import app
 
 from database.users_db import (
     get_user,
-    increase_demo,
     add_user
 )
 
@@ -47,10 +46,14 @@ async def demo(client, message):
 
         today = datetime.utcnow().strftime("%Y-%m-%d")
 
-        last_demo = user.get("last_demo_date")
+        demo_used = user.get("demo_used", 0)
 
-        # RESET DAILY DEMO
-        if last_demo != today:
+        last_demo_date = user.get("last_demo_date")
+
+        # RESET DAILY
+        if last_demo_date != today:
+
+            demo_used = 0
 
             await users.update_one(
                 {"user_id": user_id},
@@ -62,10 +65,8 @@ async def demo(client, message):
                 }
             )
 
-            user["demo_used"] = 0
-
-        # DAILY DEMO LIMIT
-        if user.get("demo_used", 0) >= 1:
+        # CHECK LIMIT
+        if demo_used >= 1:
 
             return await message.reply_text(
                 """
@@ -129,8 +130,16 @@ Today's Free Demo
 
                 print(e)
 
-        # INCREASE DEMO COUNT
-        await increase_demo(user_id)
+        # SAVE DEMO USED
+        await users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "demo_used": 1,
+                    "last_demo_date": today
+                }
+            }
+        )
 
         # SUCCESS MESSAGE
         await status.edit_text(
