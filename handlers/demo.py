@@ -1,3 +1,7 @@
+# =========================
+# DEMO COMMAND
+# =========================
+
 import asyncio
 import random
 from datetime import datetime
@@ -22,9 +26,6 @@ from database.videos_db import (
 demo_locks = {}
 
 
-# =========================
-# DEMO COMMAND
-# =========================
 @app.on_message(filters.command("demo"))
 async def demo(client, message):
 
@@ -142,6 +143,65 @@ Today's Free Demo
                     "last_demo_date": today
                 }
             }
+        )
+
+        # SUCCESS MESSAGE
+        await status.edit_text(
+            f"""
+╔════════════════════╗
+      ✅ DEMO SENT ✅
+╚════════════════════╝
+
+🎬 Successfully Sent :
+{sent_count} Demo Videos
+
+⚠️ Videos Will Auto Delete
+In 2 Minutes
+
+🚀 Come Back Tomorrow
+For Next Free Demo
+"""
+        )
+
+        # PIN SUCCESS MESSAGE
+        try:
+            await status.pin(
+                disable_notification=True
+            )
+
+        except:
+            pass
+
+        # AUTO DELETE AFTER 2 MINUTES
+        await asyncio.sleep(120)
+
+        # DELETE VIDEOS
+        for msg in sent_messages:
+
+            try:
+                await msg.delete()
+
+            except:
+                pass
+
+        # UNPIN MESSAGE
+        try:
+            await status.unpin()
+
+        except:
+            pass
+
+        # DELETE STATUS MESSAGE
+        try:
+            await status.delete()
+
+        except:
+            pass
+
+    finally:
+
+        # REMOVE LOCK
+        demo_locks.pop(user_id, None)            }
         )
 
         # SUCCESS MESSAGE
