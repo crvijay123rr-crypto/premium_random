@@ -22,6 +22,7 @@ async def add_user(user_id):
         "expiry": None,
         "used_today": 0,
         "demo_used": 0,
+        "last_demo_date": None,
         "banned": False,
         "video_index": 0,
         "total_received": 0,
@@ -110,6 +111,73 @@ async def increase_demo(user_id):
 # =========================
 # RESET DAILY LIMIT
 # =========================
+async def reset_daily_limit():
+
+    await users.update_many(
+        {},
+        {
+            "$set": {
+                "used_today": 0
+            }
+        }
+    )
+
+
+# =========================
+# BAN USER
+# =========================
+async def ban_user(user_id):
+
+    await users.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "banned": True
+            }
+        }
+    )
+
+
+# =========================
+# UNBAN USER
+# =========================
+async def unban_user(user_id):
+
+    await users.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "banned": False
+            }
+        }
+    )
+
+
+# =========================
+# CHECK PREMIUM
+# =========================
+async def is_premium(user_id):
+
+    user = await get_user(user_id)
+
+    # USER NOT FOUND
+    if not user:
+        return False
+
+    # NOT PREMIUM
+    if not user.get("premium", False):
+        return False
+
+    expiry = user.get("expiry")
+
+    # EXPIRED
+    if expiry and expiry < datetime.utcnow():
+
+        await remove_premium(user_id)
+
+        return False
+
+    return True# =========================
 async def reset_daily_limit():
 
     await users.update_many(
