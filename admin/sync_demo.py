@@ -1,4 +1,7 @@
+import asyncio
+
 from pyrogram import filters
+from pyrogram.errors import FloodWait
 
 from bot import app, userbot
 from config import DEMO_CHANNEL
@@ -13,6 +16,7 @@ async def sync_demo(client, message):
 
     success = 0
     failed = 0
+    skipped = 0
     total = 0
 
     status = await message.reply_text(
@@ -31,18 +35,35 @@ async def sync_demo(client, message):
 
         try:
 
-            # ONLY VIDEOS
-            if msg.video or msg.document:
+            # EMPTY MESSAGE
+            if msg.empty:
+                skipped += 1
+                continue
 
-                await add_demo(
-                    DEMO_CHANNEL,
-                    msg.id
-                )
+            # ONLY VIDEO / DOCUMENT
+            if not (
+                msg.video
+                or msg.document
+                or msg.animation
+            ):
+                skipped += 1
+                continue
 
-                success += 1
+            await add_demo(
+                DEMO_CHANNEL,
+                msg.id
+            )
 
-            else:
-                failed += 1
+            success += 1
+
+            # ANTI FLOOD
+            await asyncio.sleep(1)
+
+        except FloodWait as e:
+
+            print(f"FLOODWAIT : {e.value}")
+
+            await asyncio.sleep(e.value)
 
         except Exception as e:
 
@@ -50,7 +71,7 @@ async def sync_demo(client, message):
 
             print(f"SYNC ERROR : {e}")
 
-        # UPDATE PROGRESS EVERY 10 MSGS
+        # UPDATE EVERY 10 MSGS
         if total % 10 == 0:
 
             await status.edit_text(
@@ -59,34 +80,32 @@ async def sync_demo(client, message):
       🔄 DEMO SYNC 🔄
 ╚════════════════════╝
 
-📦 Checked :
-{total}
+📦 Checked : {total}
 
-✅ Success :
-{success}
+✅ Success : {success}
 
-❌ Failed :
-{failed}
+⏭️ Skipped : {skipped}
+
+❌ Failed : {failed}
 
 ⏳ Sync Running...
 """
             )
 
-    # FINAL MESSAGE
+    # FINAL
     await status.edit_text(
         f"""
 ╔════════════════════╗
       ✅ DEMO SYNCED ✅
 ╚════════════════════╝
 
-📦 Total Checked :
-{total}
+📦 Total Checked : {total}
 
-✅ Successfully Synced :
-{success}
+✅ Synced : {success}
 
-❌ Failed :
-{failed}
+⏭️ Skipped : {skipped}
+
+❌ Failed : {failed}
 
 🔥 Demo Database Updated
 """
