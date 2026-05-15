@@ -41,6 +41,7 @@ import admin.users
 import admin.premiums
 import admin.removepremium
 import admin.restart
+import admin.cleardb
 
 print("🚀 BOT STARTED SUCCESSFULLY")
 
