@@ -40,7 +40,7 @@ async def sync_demo(client, message):
                 skipped += 1
                 continue
 
-            # ONLY VIDEO / DOCUMENT
+            # ONLY VIDEO FILES
             if not (
                 msg.video
                 or msg.document
@@ -49,12 +49,16 @@ async def sync_demo(client, message):
                 skipped += 1
                 continue
 
-            await add_demo(
+            # ADD DEMO
+            added = await add_demo(
                 DEMO_CHANNEL,
                 msg.id
             )
 
-            success += 1
+            if added:
+                success += 1
+            else:
+                skipped += 1
 
             # ANTI FLOOD
             await asyncio.sleep(1)
@@ -92,7 +96,7 @@ async def sync_demo(client, message):
 """
             )
 
-    # FINAL
+    # FINAL MESSAGE
     await status.edit_text(
         f"""
 ╔════════════════════╗
