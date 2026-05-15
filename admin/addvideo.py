@@ -16,6 +16,12 @@ async def addvideo(client, message):
             "⚠️ Reply To A Video"
         )
 
+    # EMPTY MESSAGE CHECK
+    if reply.empty:
+        return await message.reply_text(
+            "❌ Empty Message"
+        )
+
     # CHECK VIDEO
     if not (
         reply.video
@@ -26,11 +32,25 @@ async def addvideo(client, message):
             "❌ Only Video Files Allowed"
         )
 
-    await add_video(
-        reply.chat.id,
-        reply.id
-    )
+    try:
 
-    await message.reply_text(
-        "✅ Premium Video Added"
-    )
+        added = await add_video(
+            reply.chat.id,
+            reply.id
+        )
+
+        # ALREADY EXISTS
+        if not added:
+            return await message.reply_text(
+                "⚠️ Video Already Added"
+            )
+
+        await message.reply_text(
+            "✅ Premium Video Added"
+        )
+
+    except Exception as e:
+
+        await message.reply_text(
+            f"❌ Error:\n{e}"
+        )
