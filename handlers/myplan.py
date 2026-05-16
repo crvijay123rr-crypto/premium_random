@@ -2,7 +2,7 @@ from pyrogram import filters
 
 from bot import app
 
-from config import PREMIUM_IDS
+from config import PREMIUM_IDS, DAILY_LIMIT
 
 from database.users_db import (
     get_user,
@@ -15,7 +15,9 @@ async def myplan(client, message):
 
     user_id = message.from_user.id
 
+    # =========================
     # GET USER
+    # =========================
     user = await get_user(user_id)
 
     # =========================
@@ -77,7 +79,9 @@ Active Premium Plan
 
     expiry = user.get("expiry")
 
-    # CUSTOM PREMIUM ID
+    # =========================
+    # EXPIRY TEXT
+    # =========================
     if user_id in PREMIUM_IDS:
 
         expiry_text = "Unlimited"
@@ -86,6 +90,9 @@ Active Premium Plan
 
         expiry_text = expiry
 
+    # =========================
+    # MESSAGE
+    # =========================
     text = f"""
 ╔════════════════════╗
       👑 PREMIUM ACTIVE 👑
@@ -97,7 +104,7 @@ Active Premium Plan
 ━━━━━━━━━━━━━━━━━━━
 
 🎥 Videos Used Today :
-{user.get('used_today', 0)}/1
+{user.get('used_today', 0)}/{DAILY_LIMIT}
 
 📦 Total Videos Received :
 {total_received}
