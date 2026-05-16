@@ -2,6 +2,8 @@ from pyrogram import filters
 
 from bot import app
 
+from config import PREMIUM_IDS
+
 from database.users_db import (
     get_user,
     is_premium
@@ -16,14 +18,22 @@ async def myplan(client, message):
     # GET USER
     user = await get_user(user_id)
 
+    # =========================
     # PREMIUM CHECK
-    premium = await is_premium(user_id)
+    # =========================
+    premium = False
 
-    # DATABASE PREMIUM CHECK
-    if not premium and user:
-        premium = user.get("premium", False)
+    # CONFIG PREMIUM IDS
+    if user_id in PREMIUM_IDS:
+        premium = True
 
+    # DATABASE PREMIUM
+    elif user:
+        premium = await is_premium(user_id)
+
+    # =========================
     # NO PREMIUM
+    # =========================
     if not premium:
 
         return await message.reply_text(
@@ -40,7 +50,9 @@ Active Premium Plan
 """
         )
 
-    # USER NOT FOUND BUT PREMIUM ID
+    # =========================
+    # CUSTOM PREMIUM USER
+    # =========================
     if not user:
 
         return await message.reply_text(
@@ -55,11 +67,24 @@ Active Premium Plan
 """
         )
 
+    # =========================
     # TOTAL RECEIVED
+    # =========================
     total_received = user.get(
         "total_received",
         0
     )
+
+    expiry = user.get("expiry")
+
+    # CUSTOM PREMIUM ID
+    if user_id in PREMIUM_IDS:
+
+        expiry_text = "Unlimited"
+
+    else:
+
+        expiry_text = expiry
 
     text = f"""
 ╔════════════════════╗
@@ -67,7 +92,7 @@ Active Premium Plan
 ╚════════════════════╝
 
 📅 Expiry Date :
-{user.get('expiry')}
+{expiry_text}
 
 ━━━━━━━━━━━━━━━━━━━
 
