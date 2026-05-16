@@ -44,7 +44,7 @@ async def demo(client, message):
     try:
 
         # ADD USER
-        await add_user(user_id)
+        await add_user(message.from_user)
 
         # SAVE NAME
         await users.update_one(
