@@ -99,7 +99,7 @@ async def start(client, message):
         )
 
     # ADD USER
-    await add_user(user_id)
+    await add_user(message.from_user)
 
     # SAVE USER NAME
     await users.update_one(
