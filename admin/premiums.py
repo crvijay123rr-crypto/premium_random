@@ -36,7 +36,16 @@ async def premiums(client, message):
 
         user_id = user.get("user_id")
 
-        text += f"\n{count}. `{user_id}`"
+        name = user.get(
+            "name",
+            "Unknown"
+        )
+
+        text += (
+            f"\n{count}. "
+            f"{name} "
+            f"→ `{user_id}`"
+        )
 
     if count == 0:
 
