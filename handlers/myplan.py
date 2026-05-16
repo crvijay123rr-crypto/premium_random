@@ -13,7 +13,14 @@ from database.users_db import (
 @app.on_message(filters.command("myplan"))
 async def myplan(client, message):
 
-    user_id = message.from_user.id
+    if not message.from_user:
+        return
+
+    user_id = int(message.from_user.id)
+
+    print("USER_ID =", user_id)
+    print("PREMIUM_IDS =", PREMIUM_IDS)
+    print("MATCH =", user_id in PREMIUM_IDS)
 
     # =========================
     # GET USER
@@ -26,7 +33,7 @@ async def myplan(client, message):
     premium = False
 
     # CONFIG PREMIUM IDS
-    if user_id in PREMIUM_IDS:
+    if user_id in list(map(int, PREMIUM_IDS)):
         premium = True
 
     # DATABASE PREMIUM
@@ -82,12 +89,10 @@ Active Premium Plan
     # =========================
     # EXPIRY TEXT
     # =========================
-    if user_id in PREMIUM_IDS:
-
+    if user_id in list(map(int, PREMIUM_IDS)):
         expiry_text = "Unlimited"
 
     else:
-
         expiry_text = expiry
 
     # =========================
