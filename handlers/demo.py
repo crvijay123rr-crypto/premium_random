@@ -22,7 +22,9 @@ from database.videos_db import (
     get_demo_videos
 )
 
+# =========================
 # ANTI SPAM
+# =========================
 demo_locks = {}
 
 
@@ -32,7 +34,9 @@ async def demo(client, message):
     user_id = message.from_user.id
     first_name = message.from_user.first_name
 
+    # =========================
     # SPAM PROTECTION
+    # =========================
     if user_id in demo_locks:
 
         return await message.reply_text(
@@ -43,10 +47,14 @@ async def demo(client, message):
 
     try:
 
+        # =========================
         # ADD USER
+        # =========================
         await add_user(message.from_user)
 
-        # SAVE NAME
+        # =========================
+        # SAVE USER NAME
+        # =========================
         await users.update_one(
             {"user_id": user_id},
             {
@@ -56,16 +64,35 @@ async def demo(client, message):
             }
         )
 
+        # =========================
         # GET USER
+        # =========================
         user = await get_user(user_id)
 
+        # SAFETY CHECK
+        if not user:
+
+            return await message.reply_text(
+                "❌ User Data Not Found"
+            )
+
+        # =========================
+        # TODAY DATE
+        # =========================
         today = datetime.utcnow().strftime("%Y-%m-%d")
 
+        # =========================
+        # GET DATA
+        # =========================
         demo_used = user.get("demo_used", 0)
 
-        last_demo_date = user.get("last_demo_date")
+        last_demo_date = str(
+            user.get("last_demo_date", "")
+        )
 
+        # =========================
         # RESET DAILY
+        # =========================
         if last_demo_date != today:
 
             demo_used = 0
@@ -80,7 +107,9 @@ async def demo(client, message):
                 }
             )
 
+        # =========================
         # CHECK LIMIT
+        # =========================
         if demo_used >= 1:
 
             return await message.reply_text(
@@ -96,7 +125,9 @@ Today's Free Demo
 """
             )
 
+        # =========================
         # GET DEMO VIDEOS
+        # =========================
         demo_videos = await get_demo_videos()
 
         if not demo_videos:
@@ -105,12 +136,19 @@ Today's Free Demo
                 "❌ No Demo Videos Found"
             )
 
-        # RANDOMIZE
+        # =========================
+        # RANDOM VIDEOS
+        # =========================
         random.shuffle(demo_videos)
 
+        # =========================
         # SELECT 50
+        # =========================
         selected = demo_videos[:50]
 
+        # =========================
+        # STATUS MESSAGE
+        # =========================
         status = await message.reply_text(
             f"⚡ Sending {len(selected)} Demo Videos..."
         )
@@ -119,7 +157,9 @@ Today's Free Demo
 
         sent_count = 0
 
+        # =========================
         # SEND VIDEOS
+        # =========================
         for video in selected:
 
             try:
@@ -145,7 +185,9 @@ Today's Free Demo
 
                 print(f"DEMO SEND ERROR : {e}")
 
+        # =========================
         # SAVE DEMO USED
+        # =========================
         await users.update_one(
             {"user_id": user_id},
             {
@@ -156,7 +198,9 @@ Today's Free Demo
             }
         )
 
+        # =========================
         # SUCCESS MESSAGE
+        # =========================
         await status.edit_text(
             f"""
 ╔════════════════════╗
@@ -174,7 +218,9 @@ For Next Free Demo
 """
         )
 
-        # PIN SUCCESS MESSAGE
+        # =========================
+        # PIN MESSAGE
+        # =========================
         try:
 
             await status.pin(
@@ -184,7 +230,9 @@ For Next Free Demo
         except:
             pass
 
-        # AUTO DELETE AFTER 2 MINUTES
+        # =========================
+        # AUTO DELETE
+        # =========================
         await asyncio.sleep(120)
 
         # DELETE VIDEOS
@@ -204,7 +252,7 @@ For Next Free Demo
         except:
             pass
 
-        # DELETE STATUS MESSAGE
+        # DELETE STATUS
         try:
 
             await status.delete()
@@ -214,5 +262,7 @@ For Next Free Demo
 
     finally:
 
+        # =========================
         # REMOVE LOCK
+        # =========================
         demo_locks.pop(user_id, None)
