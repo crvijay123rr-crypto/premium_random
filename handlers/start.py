@@ -146,6 +146,94 @@ async def check_join(client, query):
             show_alert=True
         )
 
+    try:
+        await query.message.delete()
+
+    except:
+        pass
+
+    # MAIN MENU
+    buttons = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🎥 GET VIDEOS", callback_data="videos")],
+        [InlineKeyboardButton("🎁 FREE DEMO", callback_data="demo")],
+        [InlineKeyboardButton("💳 BUY PREMIUM", callback_data="buy")],
+        [InlineKeyboardButton("📊 MY PLAN", callback_data="myplan")],
+        [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/Contact_45bot")]
+    ])
+
+    await query.message.reply_photo(
+        photo=START_PIC,
+        caption=START_TEXT,
+        reply_markup=buttons
+    )
+
+    await query.answer(
+        "✅ Access Granted"
+    )
+
+
+# =========================
+# GET VIDEOS BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^videos$"))
+async def videos_callback(client, query):
+
+    await query.answer(
+        "⚡ Sending Videos..."
+    )
+
+    await send_videos(
+        client,
+        query.message
+    )
+
+
+# =========================
+# DEMO BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^demo$"))
+async def demo_callback(client, query):
+
+    await query.answer(
+        "🎁 Sending Demo..."
+    )
+
+    await demo(
+        client,
+        query.message
+    )
+
+
+# =========================
+# BUY BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^buy$"))
+async def buy_callback(client, query):
+
+    await query.answer()
+
+    await buy(
+        client,
+        query.message
+    )
+
+
+# =========================
+# MY PLAN BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^myplan$"))
+async def myplan_callback(client, query):
+
+    await query.answer()
+
+    await myplan(
+        client,
+        query.message
+    )        return await query.answer(
+            "❌ Join Channel First",
+            show_alert=True
+        )
+
     # MAIN MENU
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("🎥 GET VIDEOS", callback_data="videos")],
