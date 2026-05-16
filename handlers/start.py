@@ -4,6 +4,7 @@ from pyrogram.errors import UserNotParticipant
 
 from bot import app
 from database.users_db import add_user
+from database.mongo import users
 
 # IMPORT FUNCTIONS
 from handlers.videos import send_videos
@@ -60,6 +61,7 @@ async def is_joined(client, user_id):
 async def start(client, message):
 
     user_id = message.from_user.id
+    first_name = message.from_user.first_name
 
     joined = await is_joined(
         client,
@@ -98,6 +100,16 @@ async def start(client, message):
 
     # ADD USER
     await add_user(user_id)
+
+    # SAVE USER NAME
+    await users.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "name": first_name
+            }
+        }
+    )
 
     # MAIN MENU
     buttons = InlineKeyboardMarkup([
@@ -142,6 +154,82 @@ async def check_join(client, query):
         [InlineKeyboardButton("📊 MY PLAN", callback_data="myplan")],
         [InlineKeyboardButton("☎ SUPPORT", url="https://t.me/Contact_45bot")]
     ])
+
+    try:
+        await query.message.delete()
+
+    except:
+        pass
+
+    await query.message.reply_photo(
+        photo=START_PIC,
+        caption=START_TEXT,
+        reply_markup=buttons
+    )
+
+    await query.answer(
+        "✅ Access Granted"
+    )
+
+
+# =========================
+# GET VIDEOS BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^videos$"))
+async def videos_callback(client, query):
+
+    await query.answer(
+        "⚡ Sending Videos..."
+    )
+
+    await send_videos(
+        client,
+        query.message
+    )
+
+
+# =========================
+# DEMO BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^demo$"))
+async def demo_callback(client, query):
+
+    await query.answer(
+        "🎁 Sending Demo..."
+    )
+
+    await demo(
+        client,
+        query.message
+    )
+
+
+# =========================
+# BUY BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^buy$"))
+async def buy_callback(client, query):
+
+    await query.answer()
+
+    await buy(
+        client,
+        query.message
+    )
+
+
+# =========================
+# MY PLAN BUTTON
+# =========================
+@app.on_callback_query(filters.regex("^myplan$"))
+async def myplan_callback(client, query):
+
+    await query.answer()
+
+    await myplan(
+        client,
+        query.message
+   )    ])
 
     try:
         await query.message.delete()
