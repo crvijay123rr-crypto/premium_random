@@ -5,19 +5,33 @@ from datetime import datetime, timedelta
 # =========================
 # ADD USER
 # =========================
-async def add_user(user_id):
+async def add_user(user):
 
-    user = await users.find_one({
+    user_id = user.id
+
+    already = await users.find_one({
         "user_id": user_id
     })
 
     # USER ALREADY EXISTS
-    if user:
+    if already:
+
+        # UPDATE NAME
+        await users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "name": user.first_name
+                }
+            }
+        )
+
         return
 
     # INSERT NEW USER
     await users.insert_one({
         "user_id": user_id,
+        "name": user.first_name,
         "premium": False,
         "expiry": None,
         "used_today": 0,
@@ -43,10 +57,12 @@ async def get_user(user_id):
 # =========================
 # ACTIVATE PREMIUM
 # =========================
-async def activate_premium(user_id, days=30):
+async def activate_premium(user, days=30):
 
     # CREATE USER FIRST
-    await add_user(user_id)
+    await add_user(user)
+
+    user_id = user.id
 
     expiry = datetime.utcnow() + timedelta(days=days)
 
@@ -142,6 +158,42 @@ async def ban_user(user_id):
 # UNBAN USER
 # =========================
 async def unban_user(user_id):
+
+    await users.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "banned": False
+            }
+        }
+    )
+
+
+# =========================
+# CHECK PREMIUM
+# =========================
+async def is_premium(user_id):
+
+    user = await get_user(user_id)
+
+    # USER NOT FOUND
+    if not user:
+        return False
+
+    # NOT PREMIUM
+    if not user.get("premium", False):
+        return False
+
+    expiry = user.get("expiry")
+
+    # EXPIRED
+    if expiry and expiry < datetime.utcnow():
+
+        await remove_premium(user_id)
+
+        return False
+
+    return Trueasync def unban_user(user_id):
 
     await users.update_one(
         {"user_id": user_id},
