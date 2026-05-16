@@ -13,15 +13,6 @@ async def myplan(client, message):
 
     user_id = message.from_user.id
 
-    user = await get_user(user_id)
-
-    # USER NOT FOUND
-    if not user:
-
-        return await message.reply_text(
-            "❌ User not found.\nPlease send start first."
-        )
-
     # PREMIUM CHECK
     premium = await is_premium(user_id)
 
@@ -41,6 +32,24 @@ Active Premium Plan
 @Contact_45bot
 """
         )
+
+    # GET USER
+    user = await get_user(user_id)
+
+    # USER NOT FOUND
+    if not user:
+
+        text = """
+╔════════════════════╗
+      👑 PREMIUM ACTIVE 👑
+╚════════════════════╝
+
+♾ Unlimited Premium Access
+
+🚀 Custom Premium ID User
+"""
+
+        return await message.reply_text(text)
 
     # TOTAL RECEIVED
     total_received = user.get(
