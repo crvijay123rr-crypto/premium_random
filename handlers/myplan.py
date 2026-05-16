@@ -13,8 +13,15 @@ async def myplan(client, message):
 
     user_id = message.from_user.id
 
+    # GET USER
+    user = await get_user(user_id)
+
     # PREMIUM CHECK
     premium = await is_premium(user_id)
+
+    # DATABASE PREMIUM CHECK
+    if not premium and user:
+        premium = user.get("premium", False)
 
     # NO PREMIUM
     if not premium:
@@ -33,13 +40,11 @@ Active Premium Plan
 """
         )
 
-    # GET USER
-    user = await get_user(user_id)
-
-    # USER NOT FOUND
+    # USER NOT FOUND BUT PREMIUM ID
     if not user:
 
-        text = """
+        return await message.reply_text(
+            """
 ╔════════════════════╗
       👑 PREMIUM ACTIVE 👑
 ╚════════════════════╝
@@ -48,8 +53,7 @@ Active Premium Plan
 
 🚀 Custom Premium ID User
 """
-
-        return await message.reply_text(text)
+        )
 
     # TOTAL RECEIVED
     total_received = user.get(
